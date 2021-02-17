@@ -1,0 +1,7 @@
+package goveed20.LiteraryAssociationApplication.elastic.repositories;
+
+import goveed20.LiteraryAssociationApplication.elastic.indexingUnits.BetaReaderIndexingUnit;
+import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+
+public interface BetaReaderIndexingUnitRepository extends ElasticsearchRepository<BetaReaderIndexingUnit, Long> {
+}
