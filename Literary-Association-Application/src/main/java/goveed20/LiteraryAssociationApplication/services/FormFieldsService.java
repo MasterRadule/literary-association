@@ -207,6 +207,7 @@ public class FormFieldsService {
                 .put("additional", UtilService.serializeAdditionalContent(additionalContent));
     }
 
+    @SuppressWarnings("unchecked")
     private AdditionalContentDTO createAdditionalContent(boolean isComment, List<WorkingPaper> workingPapersList, Writer writer, Task task) {
         AdditionalContentDTO additionalContentDTO;
         if (!isComment) {
@@ -248,6 +249,10 @@ public class FormFieldsService {
                             .findAllByTypeAndApplicationPapersContaining(CommentType.EDITOR_COMMENT, workingPapersList
                                     .get(0))
                             .forEach(comment -> comments.add(comment.getContent()));
+                    break;
+                case "plagiarism_form":
+                    comments.addAll((List<String>) runtimeService
+                            .getVariable(task.getProcessInstanceId(), "similar_papers"));
                     break;
             }
             additionalContentDTO = AdditionalContentDTO.builder()
