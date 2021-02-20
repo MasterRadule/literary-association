@@ -3,6 +3,7 @@ package goveed20.LiteraryAssociationApplication.services;
 import goveed20.LiteraryAssociationApplication.dtos.AdditionalContentDTO;
 import goveed20.LiteraryAssociationApplication.dtos.ButtonDTO;
 import goveed20.LiteraryAssociationApplication.dtos.WorkingPaperDTO;
+import goveed20.LiteraryAssociationApplication.elastic.services.BetaReadersService;
 import goveed20.LiteraryAssociationApplication.model.Book;
 import goveed20.LiteraryAssociationApplication.model.WorkingPaper;
 import goveed20.LiteraryAssociationApplication.model.Writer;
@@ -50,6 +51,9 @@ public class FormFieldsService {
 
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private BetaReadersService betaReadersService;
 
     public void setSelectFormFields(Task task) {
         TaskFormData tfd = formService.getTaskFormData(task.getId());
@@ -100,9 +104,11 @@ public class FormFieldsService {
                 case "beta_readers":
                     String title = (String) runtimeService.getVariable(task.getProcessInstanceId(), "working_paper");
                     WorkingPaper workingPaper = workingPaperRepository.findByTitle(title);
-                    p.getProperties().put("options", UtilService
-                            .serializeBetaReaders(new HashSet<>(betaReaderStatusRepository
-                                    .findByBetaGenresContaining(workingPaper.getGenre()))));
+                    String writerUsername = (String) runtimeService.getVariable(task.getProcessInstanceId(), "writer");
+                    Writer writer = writerRepository.findByUsername(writerUsername).get();
+                    p.getProperties().put("options", UtilService.serializeBetaReaderIndexingUnits(betaReadersService
+                            .getAppropriateBetaReaders(workingPaper.getGenre().getGenre().serbianName,
+                                    writer.getLocation().getLatitude(), writer.getLocation().getLongitude())));
                     break;
                 case "editors":
                     p.getProperties().put("options", UtilService.serializeEditors(new HashSet<>(
@@ -118,8 +124,6 @@ public class FormFieldsService {
                             baseUserRepository.findAllByRoleEqualsAndUsernameNotIn(UserRole.EDITOR, editors)
                     )));
                     break;
-                default:
-                    return;
             }
         });
     }

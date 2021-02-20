@@ -2,12 +2,9 @@ package goveed20.LiteraryAssociationApplication.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import goveed20.LiteraryAssociationApplication.dtos.ButtonDTO;
-import goveed20.LiteraryAssociationApplication.dtos.FormSubmissionFieldDTO;
-import goveed20.LiteraryAssociationApplication.dtos.OptionDTO;
-import goveed20.LiteraryAssociationApplication.model.BaseUser;
 import goveed20.LiteraryAssociationApplication.dtos.*;
-import goveed20.LiteraryAssociationApplication.model.BetaReaderStatus;
+import goveed20.LiteraryAssociationApplication.elastic.indexingUnits.BetaReaderIndexingUnit;
+import goveed20.LiteraryAssociationApplication.model.BaseUser;
 import goveed20.LiteraryAssociationApplication.model.Genre;
 import org.camunda.bpm.engine.form.FormField;
 
@@ -35,10 +32,12 @@ public class UtilService {
                 .collect(Collectors.toList()));
     }
 
-    public static String serializeBetaReaders(HashSet<BetaReaderStatus> betaReaderStatuses) {
+    public static String serializeBetaReaderIndexingUnits(List<BetaReaderIndexingUnit> appropriateBetaReaders) {
         Gson gson = new Gson();
-        return gson.toJson(betaReaderStatuses.stream().map(b -> OptionDTO.builder().name(b.getReader().getName() + " " + b.getReader().getSurname())
-                .value(b.getReader().getUsername())).collect(Collectors.toSet()));
+
+        return gson.toJson(appropriateBetaReaders.stream()
+                .map(b -> OptionDTO.builder().name(b.getName()).value(b.getUsername()).build())
+                .collect(Collectors.toSet()));
     }
 
     public static String serializeEditors(HashSet<BaseUser> baseUsers) {
@@ -54,7 +53,8 @@ public class UtilService {
 
     private static String serializeOptions(Set<String> options) {
         Gson gson = new Gson();
-        return gson.toJson(options.stream().map(o -> OptionDTO.builder().name(o).value(o).build()).collect(Collectors.toSet()));
+        return gson.toJson(options.stream().map(o -> OptionDTO.builder().name(o).value(o).build())
+                .collect(Collectors.toSet()));
     }
 
     public static String serializeButtons(List<ButtonDTO> buttons) {
@@ -67,7 +67,8 @@ public class UtilService {
             return new HashSet<>();
         }
         Gson gson = new Gson();
-        Type genreSet = new TypeToken<Set<Genre>>() {}.getType();
+        Type genreSet = new TypeToken<Set<Genre>>() {
+        }.getType();
         return gson.fromJson(genres, genreSet);
     }
 
@@ -76,7 +77,8 @@ public class UtilService {
             return new HashSet<>();
         }
         Gson gson = new Gson();
-        Type betaReaderSet = new TypeToken<Set<BetaReaderDTO>>() {}.getType();
+        Type betaReaderSet = new TypeToken<Set<BetaReaderDTO>>() {
+        }.getType();
         return gson.fromJson(betaReaders, betaReaderSet);
     }
 
@@ -85,7 +87,8 @@ public class UtilService {
             return new HashSet<>();
         }
         Gson gson = new Gson();
-        Type editorSet = new TypeToken<Set<String>>() {}.getType();
+        Type editorSet = new TypeToken<Set<String>>() {
+        }.getType();
         return gson.fromJson(editors, editorSet);
     }
 

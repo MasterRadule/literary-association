@@ -43,9 +43,10 @@ public class IndexingUnitService {
         betaReaderIndexingUnitRepository.save(
                 BetaReaderIndexingUnit.builder()
                         .id(reader.getId())
+                        .username(reader.getUsername())
                         .location(new GeoPoint(reader.getLocation().getLatitude(), reader.getLocation().getLongitude()))
                         .name(String.format("%s %s", reader.getName(), reader.getSurname()))
-                        .genres(reader.getBetaReaderStatus().getBetaGenres().stream().map(g -> g.getGenre().serbianName)
+                        .betaGenres(reader.getBetaReaderStatus().getBetaGenres().stream().map(g -> g.getGenre().serbianName)
                                 .collect(Collectors.toList()))
                         .build()
         );

@@ -22,6 +22,9 @@ public class BetaReaderIndexingUnit {
     @Field(type = FieldType.Long, store = true)
     private Long id;
 
+    @Field(type = FieldType.Text)
+    private String username;
+
     @GeoPointField
     private GeoPoint location;
 
@@ -29,5 +32,5 @@ public class BetaReaderIndexingUnit {
     private String name;
 
     @Field(type = FieldType.Keyword)
-    private List<String> genres;
+    private List<String> betaGenres;
 }
