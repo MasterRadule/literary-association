@@ -91,8 +91,9 @@ public class DummyDataService {
             System.out.println("Created dummy board members!");
         }
 
-        if (baseUserRepository.findAllByRole(UserRole.WRITER).isEmpty() && bookRepository.findAll().isEmpty() && retailerRepository.findAll().isEmpty()
-        && baseUserRepository.findAllByRole(UserRole.READER).isEmpty()) {
+        if (baseUserRepository.findAllByRole(UserRole.WRITER).isEmpty() && bookRepository.findAll()
+                .isEmpty() && retailerRepository.findAll().isEmpty()
+                && baseUserRepository.findAllByRole(UserRole.READER).isEmpty()) {
 
             if (genreRepository.findAll().isEmpty()) {
                 Arrays.stream(GenreEnum.values()).forEach(e -> genreRepository.save(new Genre(null, e)));
@@ -102,40 +103,76 @@ public class DummyDataService {
             Genre g2 = genreRepository.findByGenre(GenreEnum.FANTASY);
             Genre g3 = genreRepository.findByGenre(GenreEnum.EROTIC);
 
+            Set<Genre> betaGenres1 = new HashSet<>();
+            betaGenres1.add(g1);
+            BetaReaderStatus brs1 = BetaReaderStatus.builder().betaGenres(betaGenres1).betaReaderPapers(new HashSet<>())
+                    .penaltyPoints(0)
+                    .build();
             Reader reader1 = Reader.readerBuilder()
                     .role(UserRole.READER)
                     .username("reader1")
                     .password(passwordEncoder.encode("password1"))
-                    .name("reader1")
-                    .surname("reader1")
+                    .name("Marko")
+                    .surname("Markovic")
                     .email("reader1@maildrop.cc")
                     .comments(new HashSet<>())
                     .transactions(new HashSet<>())
                     .genres(new HashSet<>())
-                    .betaReader(false)
-                    .location(locationService.createLocation("dummyland", "dummytown"))
+                    .betaReader(true)
+                    .location(locationService.createLocation("Serbia", "Belgrade"))
                     .verified(true)
                     .build();
+            brs1.setReader(reader1);
+            reader1.setBetaReaderStatus(brs1);
 
+            Set<Genre> betaGenres2 = new HashSet<>();
+            betaGenres2.add(g1);
+            BetaReaderStatus brs2 = BetaReaderStatus.builder().betaGenres(betaGenres2).betaReaderPapers(new HashSet<>())
+                    .penaltyPoints(0)
+                    .build();
             Reader reader2 = Reader.readerBuilder()
                     .role(UserRole.READER)
                     .username("reader2")
                     .password(passwordEncoder.encode("password2"))
-                    .name("reader2")
-                    .surname("reader2")
+                    .name("Edo")
+                    .surname("Teka")
                     .email("reader2@maildrop.cc")
                     .comments(new HashSet<>())
                     .transactions(new HashSet<>())
                     .genres(new HashSet<>())
-                    .betaReader(false)
-                    .location(locationService.createLocation("dummyland", "dummytown"))
+                    .betaReader(true)
+                    .location(locationService.createLocation("Germany", "Berlin"))
                     .verified(true)
                     .build();
+            brs2.setReader(reader2);
+            reader2.setBetaReaderStatus(brs2);
+
+            Set<Genre> betaGenres3 = new HashSet<>();
+            betaGenres3.add(g1);
+            BetaReaderStatus brs3 = BetaReaderStatus.builder().betaGenres(betaGenres3).betaReaderPapers(new HashSet<>())
+                    .penaltyPoints(0)
+                    .build();
+            Reader reader3 = Reader.readerBuilder()
+                    .role(UserRole.READER)
+                    .username("reader3")
+                    .password(passwordEncoder.encode("password3"))
+                    .name("Milos")
+                    .surname("Vucic")
+                    .email("reader3@maildrop.cc")
+                    .comments(new HashSet<>())
+                    .transactions(new HashSet<>())
+                    .genres(new HashSet<>())
+                    .betaReader(true)
+                    .location(locationService.createLocation("Germany", "Berlin"))
+                    .verified(true)
+                    .build();
+            brs3.setReader(reader3);
+            reader3.setBetaReaderStatus(brs3);
 
             Writer writer1 = Writer.writerBuilder()
                     .role(UserRole.WRITER)
                     .genres(new HashSet<>())
-                    .location(locationService.createLocation("Serbia", "Novi Sad"))
+                    .location(locationService.createLocation("Serbia", "Zemun"))
                     .comments(new HashSet<>())
                     .transactions(new HashSet<>())
                     .verified(true)
@@ -350,8 +387,13 @@ public class DummyDataService {
 
             baseUserRepository.save(reader1);
             baseUserRepository.save(reader2);
+            baseUserRepository.save(reader3);
             camundaUserService.createCamundaUser(reader1);
             camundaUserService.createCamundaUser(reader2);
+            camundaUserService.createCamundaUser(reader3);
+            indexingUnitService.createBetaReaderIndexingUnit(reader1);
+            indexingUnitService.createBetaReaderIndexingUnit(reader2);
+            indexingUnitService.createBetaReaderIndexingUnit(reader3);
         }
 
 
