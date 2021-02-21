@@ -172,7 +172,7 @@
         </camunda:formData>
         <camunda:properties>
           <camunda:property name="basic_select" value="true" />
-          <camunda:property name="additional_content" value="1" />
+          <camunda:property name="additional_content" value="3" />
         </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_10tv1k9</bpmn:incoming>
@@ -326,7 +326,7 @@
         </camunda:formData>
         <camunda:properties>
           <camunda:property name="beta_reader_select" value="true" />
-          <camunda:property name="additional_content" value="3" />
+          <camunda:property name="additional_content" value="1" />
         </camunda:properties>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0mh7w1n</bpmn:incoming>

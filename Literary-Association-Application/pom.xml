@@ -169,12 +169,16 @@
 			<version>2.0.8</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+			<version>2.2.6.RELEASE</version>
+		</dependency>
 
 	</dependencies>
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- Elasticsearch and Lucene - Replace versions -->
 			<dependency>
 				<groupId>org.elasticsearch.client</groupId>
 				<artifactId>transport</artifactId>

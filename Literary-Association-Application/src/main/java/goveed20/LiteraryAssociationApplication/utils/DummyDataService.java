@@ -17,6 +17,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -51,8 +52,11 @@ public class DummyDataService {
     @Autowired
     private IndexingUnitService indexingUnitService;
 
+    @Autowired
+    private PlagiatorService plagiatorService;
+
     @EventListener(ApplicationReadyEvent.class)
-    public void addDummyData() {
+    public void addDummyData() throws IOException {
         indexingUnitService.deleteAllIndexes();
 
         if (baseUserRepository.findAllByRole(UserRole.BOARD_MEMBER).isEmpty()) {
@@ -315,6 +319,12 @@ public class DummyDataService {
             indexingUnitService.createBookIndexingUnit(b3);
             indexingUnitService.createBookIndexingUnit(book);
             indexingUnitService.createBookIndexingUnit(book2);
+
+            plagiatorService.uploadExistingPaper(b1.getTitle(), b1.getFile());
+            plagiatorService.uploadExistingPaper(b2.getTitle(), b2.getFile());
+            plagiatorService.uploadExistingPaper(b3.getTitle(), b3.getFile());
+            plagiatorService.uploadExistingPaper(book.getTitle(), book.getFile());
+            plagiatorService.uploadExistingPaper(book2.getTitle(), book2.getFile());
 
             InvoiceItem item = InvoiceItem.builder().name(b3.getTitle())
                     .price(b3.getPrice()).quantity(1).build();

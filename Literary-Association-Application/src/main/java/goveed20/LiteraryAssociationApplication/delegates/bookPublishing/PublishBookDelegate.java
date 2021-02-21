@@ -1,5 +1,6 @@
 package goveed20.LiteraryAssociationApplication.delegates.bookPublishing;
 
+import goveed20.LiteraryAssociationApplication.elastic.utils.IndexingUnitService;
 import goveed20.LiteraryAssociationApplication.model.Book;
 import goveed20.LiteraryAssociationApplication.model.WorkingPaper;
 import goveed20.LiteraryAssociationApplication.model.Writer;
@@ -8,6 +9,7 @@ import goveed20.LiteraryAssociationApplication.repositories.BookRepository;
 import goveed20.LiteraryAssociationApplication.repositories.WorkingPaperRepository;
 import goveed20.LiteraryAssociationApplication.repositories.WriterRepository;
 import goveed20.LiteraryAssociationApplication.utils.NotificationService;
+import goveed20.LiteraryAssociationApplication.utils.PlagiatorService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,12 @@ public class PublishBookDelegate implements JavaDelegate {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private IndexingUnitService indexingUnitService;
+
+    @Autowired
+    private PlagiatorService plagiatorService;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -62,6 +70,15 @@ public class PublishBookDelegate implements JavaDelegate {
 
         book.setWriter(writer);
         bookRepository.save(book);
+        indexingUnitService.createBookIndexingUnit(book);
+
+        try {
+            Long uploadedPaperId = (Long) delegateExecution.getVariable("uploaded_paper_id");
+            plagiatorService.deletePaper(uploadedPaperId);
+            plagiatorService.uploadExistingPaper(book.getTitle(), book.getFile());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
         notificationService.sendSuccessNotification("Book successfully published");
     }
