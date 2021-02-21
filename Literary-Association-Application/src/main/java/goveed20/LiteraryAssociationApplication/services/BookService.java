@@ -156,7 +156,7 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    private Set<String> getBookTitles(BaseUser reader) {
+    public Set<String> getBookTitles(BaseUser reader) {
         if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(UserRole.READER)) {
             return reader.getTransactions().stream().filter(t -> t.getStatus().equals(TransactionStatus.COMPLETED)
                     && !(t instanceof MembershipTransaction)).map(t -> t.getInvoice().getInvoiceItems().stream()

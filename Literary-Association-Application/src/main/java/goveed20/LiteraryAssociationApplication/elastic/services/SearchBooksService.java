@@ -3,6 +3,8 @@ package goveed20.LiteraryAssociationApplication.elastic.services;
 import goveed20.LiteraryAssociationApplication.elastic.dtos.SearchParamsDTO;
 import goveed20.LiteraryAssociationApplication.elastic.indexingUnits.BookIndexingUnit;
 import goveed20.LiteraryAssociationApplication.elastic.utils.BooksMapper;
+import goveed20.LiteraryAssociationApplication.model.Reader;
+import goveed20.LiteraryAssociationApplication.services.BookService;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
@@ -12,7 +14,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 public class SearchBooksService {
@@ -20,9 +25,17 @@ public class SearchBooksService {
     @Autowired
     private ElasticsearchTemplate elasticsearchTemplate;
 
+    @Autowired
+    private BookService bookService;
+
     public Page<BookIndexingUnit> searchBooks(SearchParamsDTO searchParams) {
         NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        Reader reader = (goveed20.LiteraryAssociationApplication.model.Reader) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        Set<String> myBookTitles = bookService.getBookTitles(reader);
+        myBookTitles.forEach(title -> boolQueryBuilder.mustNot(QueryBuilders.commonTermsQuery("title", title)));
 
         searchParams.getParams().forEach(param -> {
 
@@ -49,7 +62,7 @@ public class SearchBooksService {
                         .preTags("<b>")
                         .postTags("</b>")
                         .numOfFragments(1)
-                        .fragmentSize(150)).withPageable(PageRequest.of(searchParams.getPageNumber(), 5)).build();
+                        .fragmentSize(200)).withPageable(PageRequest.of(searchParams.getPageNumber(), 5)).build();
 
         return elasticsearchTemplate.queryForPage(query, BookIndexingUnit.class, new BooksMapper());
     }

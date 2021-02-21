@@ -16,6 +16,15 @@ export const getBooks = (myBooks) => {
     }
 }
 
+export const setMyBooks = (myBooks) => {
+    return async dispatch => {
+        dispatch({
+            type: 'SET_MY_BOOKS',
+            myBooks
+        })
+    }
+}
+
 export const setBook = (id) => {
     return async dispatch => {
         const book = await bookService.getBook(id)
@@ -23,6 +32,46 @@ export const setBook = (id) => {
         dispatch({
             type: 'SET_BOOK',
             book
+        })
+    }
+}
+
+export const searchBooks = (query) => {
+    return async dispatch => {
+        const books = await bookService.searchBooks(query)
+
+        dispatch({
+            type: 'GET_BOOKS',
+            books: books ? books['content'] : []
+        })
+
+        dispatch({
+            type: 'SET_PAGE',
+            page: query['pageNumber']
+        })
+
+        dispatch({
+            type: 'SET_TOTAL_PAGES',
+            totalPages: books['totalPages']
+        })
+    }
+}
+
+export const clearSearch = () => {
+    return async dispatch => {
+        dispatch({
+            type: 'GET_BOOKS',
+            books: []
+        })
+
+        dispatch({
+            type: 'SET_PAGE',
+            page: 0
+        })
+
+        dispatch({
+            type: 'SET_TOTAL_PAGES',
+            totalPages: 0
         })
     }
 }

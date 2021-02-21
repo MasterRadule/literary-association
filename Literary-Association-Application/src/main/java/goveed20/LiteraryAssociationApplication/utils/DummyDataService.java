@@ -1,5 +1,6 @@
 package goveed20.LiteraryAssociationApplication.utils;
 
+import goveed20.LiteraryAssociationApplication.elastic.utils.IndexingUnitService;
 import goveed20.LiteraryAssociationApplication.model.*;
 import goveed20.LiteraryAssociationApplication.model.enums.GenreEnum;
 import goveed20.LiteraryAssociationApplication.model.enums.TransactionStatus;
@@ -47,8 +48,13 @@ public class DummyDataService {
     @Autowired
     private RetailerRepository retailerRepository;
 
+    @Autowired
+    private IndexingUnitService indexingUnitService;
+
     @EventListener(ApplicationReadyEvent.class)
     public void addDummyData() {
+        indexingUnitService.deleteAllIndexes();
+
         if (baseUserRepository.findAllByRole(UserRole.BOARD_MEMBER).isEmpty()) {
             BaseUser boardMember1 = BaseUser.builder()
                     .name("board_member_1_name")
@@ -251,8 +257,8 @@ public class DummyDataService {
             b2.setWriter(writer2);
 
             Book b3 = Book.bookBuilder()
-                    .file(String.format("%sSistemi elektronskog poslovanja.pdf", booksFolder))
-                    .title("Sistemi elektronskog poslovanja")
+                    .file(String.format("%sŽivotinjska farma.pdf", booksFolder))
+                    .title("Životinjska farma")
                     .synopsis("Sinobsis")
                     .genre(g3)
                     .ISBN("0-6918-9816-4")
@@ -269,7 +275,7 @@ public class DummyDataService {
             Book book = Book.bookBuilder()
                     .ISBN("123412341234")
                     .publisher("Carobna kljiga")
-                    .title("Kljiga")
+                    .title("Stranac")
                     .publicationYear(1998)
                     .keywords("kljucne reci")
                     .pages(256)
@@ -277,7 +283,7 @@ public class DummyDataService {
                     .genre(genreRepository.findByGenre(GenreEnum.COOKBOOKS))
                     .synopsis("Sinobsis")
                     .price(302.00)
-                    .file("Literary-Association-Application/src/main/resources/books/Kljiga.pdf")
+                    .file(String.format("%sStranac.pdf", booksFolder))
                     .additionalAuthors("Gagata Gagic")
                     .build();
             book.setWriter(writer4);
@@ -285,7 +291,7 @@ public class DummyDataService {
             Book book2 = Book.bookBuilder()
                     .ISBN("653515341234")
                     .publisher("Simgidulum")
-                    .title("Tajtl")
+                    .title("Prokleta avlija")
                     .publicationYear(2005)
                     .keywords("kljucne reci")
                     .pages(256)
@@ -293,7 +299,7 @@ public class DummyDataService {
                     .genre(genreRepository.findByGenre(GenreEnum.COOKBOOKS))
                     .synopsis("Sinobsis")
                     .price(203.00)
-                    .file("Literary-Association-Application/src/main/resources/books/Tajtl.pdf")
+                    .file(String.format("%sProkleta avlija.pdf", booksFolder))
                     .additionalAuthors("Ivo Andric,Lazo Lazic")
                     .build();
             book2.setWriter(writer5);
@@ -303,6 +309,12 @@ public class DummyDataService {
             bookRepository.save(b3);
             bookRepository.save(book);
             bookRepository.save(book2);
+
+            indexingUnitService.createBookIndexingUnit(b1);
+            indexingUnitService.createBookIndexingUnit(b2);
+            indexingUnitService.createBookIndexingUnit(b3);
+            indexingUnitService.createBookIndexingUnit(book);
+            indexingUnitService.createBookIndexingUnit(book2);
 
             InvoiceItem item = InvoiceItem.builder().name(b3.getTitle())
                     .price(b3.getPrice()).quantity(1).build();

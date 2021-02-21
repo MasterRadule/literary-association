@@ -1,9 +1,13 @@
 package goveed20.LiteraryAssociationApplication.controllers;
 
 import goveed20.LiteraryAssociationApplication.dtos.BookListItemDTO;
+import goveed20.LiteraryAssociationApplication.elastic.dtos.SearchParamsDTO;
+import goveed20.LiteraryAssociationApplication.elastic.indexingUnits.BookIndexingUnit;
+import goveed20.LiteraryAssociationApplication.elastic.services.SearchBooksService;
 import goveed20.LiteraryAssociationApplication.exceptions.NotFoundException;
 import goveed20.LiteraryAssociationApplication.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +22,15 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
+
+    @Autowired
+    private SearchBooksService searchBooksService;
+
+    @PreAuthorize("hasAuthority('READER')")
+    @PostMapping("/search")
+    public ResponseEntity<Page<BookIndexingUnit>> searchBooks(@RequestBody SearchParamsDTO searchParams) {
+        return new ResponseEntity<>(searchBooksService.searchBooks(searchParams), HttpStatus.OK);
+    }
 
     @PreAuthorize("hasAuthority('READER') or hasAuthority('WRITER')")
     @GetMapping

@@ -32,7 +32,9 @@ public class IndexingUnitService {
                         .title(book.getTitle())
                         .genre(book.getGenre().getGenre().serbianName)
                         .openAccess(book.getPrice() == 0.0)
-                        .writers(book.getAdditionalAuthors())
+                        .writers(String
+                                .format("%s %s,%s", book.getWriter().getName(), book.getWriter().getSurname(), book
+                                        .getAdditionalAuthors()))
                         .basicInfo(UtilService.getBookBasicInfo(book))
                         .text(pdfService.getText(new File(book.getFile())))
                         .build()
@@ -46,9 +48,15 @@ public class IndexingUnitService {
                         .username(reader.getUsername())
                         .location(new GeoPoint(reader.getLocation().getLatitude(), reader.getLocation().getLongitude()))
                         .name(String.format("%s %s", reader.getName(), reader.getSurname()))
-                        .betaGenres(reader.getBetaReaderStatus().getBetaGenres().stream().map(g -> g.getGenre().serbianName)
+                        .betaGenres(reader.getBetaReaderStatus().getBetaGenres().stream()
+                                .map(g -> g.getGenre().serbianName)
                                 .collect(Collectors.toList()))
                         .build()
         );
+    }
+
+    public void deleteAllIndexes() {
+        bookIndexingUnitRepository.deleteAll();
+        betaReaderIndexingUnitRepository.deleteAll();
     }
 }

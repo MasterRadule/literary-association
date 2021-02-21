@@ -7,22 +7,28 @@ import CurrencyFormat from 'react-currency-format'
 const PaymentModal = ({ show, toggleModal }) => {
     const book = useSelector(state => state.books.shown)
 
-    return (
-        <Modal show={show} onHide={toggleModal}>
-            <Modal.Header closeButton>
-                <Modal.Title>Purchase item</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Row style={{ marginLeft: 'auto', marginRight: 'auto' }}>
-                    <i>{book.title}</i>
-                    &nbsp;
-                    <CurrencyFormat value={book.price} displayType={'text'} thousandSeparator={true} prefix={'$'}
-                                    renderText={value => <i>{value}</i>}/>
-                </Row>
-                <PurchaseForm toggleModal={toggleModal}/>
-            </Modal.Body>
-        </Modal>
-    )
+    if (book) {
+        return (
+            <Modal show={show} onHide={toggleModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Purchase item</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Row style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                        <i>{book.title}</i>
+                        &nbsp;
+                        <CurrencyFormat value={book.price} displayType={'text'} thousandSeparator={true} prefix={'$'}
+                                        renderText={value => <i>{value}</i>}/>
+                    </Row>
+                    <PurchaseForm toggleModal={toggleModal}/>
+                </Modal.Body>
+            </Modal>
+        )
+    }
+    else {
+        return null
+    }
+
 }
 
 export default PaymentModal
