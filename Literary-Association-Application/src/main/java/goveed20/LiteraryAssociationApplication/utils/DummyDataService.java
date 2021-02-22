@@ -56,8 +56,13 @@ public class DummyDataService {
     private PlagiatorService plagiatorService;
 
     @EventListener(ApplicationReadyEvent.class)
-    public void addDummyData() throws IOException {
+    public void addDummyData() throws IOException, InterruptedException {
         indexingUnitService.deleteAllIndexes();
+        Location belgrade = locationService.createLocation("Serbia", "Belgrade");
+        Thread.sleep(1000);
+        Location stuttgart = locationService.createLocation("Germany", "Stuttgart");
+        Thread.sleep(1000);
+        Location subotica = locationService.createLocation("Serbia", "Subotica");
 
         if (baseUserRepository.findAllByRole(UserRole.BOARD_MEMBER).isEmpty()) {
             BaseUser boardMember1 = BaseUser.builder()
@@ -119,7 +124,7 @@ public class DummyDataService {
                     .transactions(new HashSet<>())
                     .genres(new HashSet<>())
                     .betaReader(true)
-                    .location(locationService.createLocation("Serbia", "Belgrade"))
+                    .location(belgrade.toBuilder().build())
                     .verified(true)
                     .build();
             brs1.setReader(reader1);
@@ -141,7 +146,7 @@ public class DummyDataService {
                     .transactions(new HashSet<>())
                     .genres(new HashSet<>())
                     .betaReader(true)
-                    .location(locationService.createLocation("Germany", "Berlin"))
+                    .location(stuttgart.toBuilder().build())
                     .verified(true)
                     .build();
             brs2.setReader(reader2);
@@ -163,16 +168,38 @@ public class DummyDataService {
                     .transactions(new HashSet<>())
                     .genres(new HashSet<>())
                     .betaReader(true)
-                    .location(locationService.createLocation("Germany", "Berlin"))
+                    .location(stuttgart.toBuilder().build())
                     .verified(true)
                     .build();
             brs3.setReader(reader3);
             reader3.setBetaReaderStatus(brs3);
 
+            Set<Genre> betaGenres4 = new HashSet<>();
+            betaGenres4.add(g1);
+            BetaReaderStatus brs4 = BetaReaderStatus.builder().betaGenres(betaGenres4).betaReaderPapers(new HashSet<>())
+                    .penaltyPoints(0)
+                    .build();
+            Reader reader4 = Reader.readerBuilder()
+                    .role(UserRole.READER)
+                    .username("reader4")
+                    .password(passwordEncoder.encode("password4"))
+                    .name("Mirko")
+                    .surname("Mirkovic")
+                    .email("reader4@maildrop.cc")
+                    .comments(new HashSet<>())
+                    .transactions(new HashSet<>())
+                    .genres(new HashSet<>())
+                    .betaReader(true)
+                    .location(stuttgart.toBuilder().build())
+                    .verified(true)
+                    .build();
+            brs4.setReader(reader4);
+            reader4.setBetaReaderStatus(brs4);
+
             Writer writer1 = Writer.writerBuilder()
                     .role(UserRole.WRITER)
                     .genres(new HashSet<>())
-                    .location(locationService.createLocation("Serbia", "Zemun"))
+                    .location(belgrade.toBuilder().build())
                     .comments(new HashSet<>())
                     .transactions(new HashSet<>())
                     .verified(true)
@@ -190,7 +217,7 @@ public class DummyDataService {
             Writer writer2 = Writer.writerBuilder()
                     .role(UserRole.WRITER)
                     .genres(new HashSet<>())
-                    .location(locationService.createLocation("Serbia", "Novi Sad"))
+                    .location(subotica.toBuilder().build())
                     .comments(new HashSet<>())
                     .transactions(new HashSet<>())
                     .verified(true)
@@ -208,7 +235,7 @@ public class DummyDataService {
             Writer writer3 = Writer.writerBuilder()
                     .role(UserRole.WRITER)
                     .genres(new HashSet<>())
-                    .location(locationService.createLocation("Serbia", "Novi Sad"))
+                    .location(subotica.toBuilder().build())
                     .comments(new HashSet<>())
                     .transactions(new HashSet<>())
                     .verified(true)
@@ -226,7 +253,7 @@ public class DummyDataService {
             Writer writer4 = Writer.writerBuilder()
                     .role(UserRole.WRITER)
                     .genres(new HashSet<>())
-                    .location(locationService.createLocation("Serbia", "Novi Sad"))
+                    .location(subotica.toBuilder().build())
                     .comments(new HashSet<>())
                     .transactions(new HashSet<>())
                     .verified(true)
@@ -244,7 +271,7 @@ public class DummyDataService {
             Writer writer5 = Writer.writerBuilder()
                     .role(UserRole.WRITER)
                     .genres(new HashSet<>())
-                    .location(locationService.createLocation("Serbia", "Novi Sad"))
+                    .location(subotica.toBuilder().build())
                     .comments(new HashSet<>())
                     .transactions(new HashSet<>())
                     .verified(true)
@@ -357,11 +384,11 @@ public class DummyDataService {
             indexingUnitService.createBookIndexingUnit(book);
             indexingUnitService.createBookIndexingUnit(book2);
 
-            plagiatorService.uploadExistingPaper(b1.getTitle(), b1.getFile());
-            plagiatorService.uploadExistingPaper(b2.getTitle(), b2.getFile());
-            plagiatorService.uploadExistingPaper(b3.getTitle(), b3.getFile());
-            plagiatorService.uploadExistingPaper(book.getTitle(), book.getFile());
-            plagiatorService.uploadExistingPaper(book2.getTitle(), book2.getFile());
+            plagiatorService.uploadNewPaper(b1.getTitle(), b1.getFile());
+            plagiatorService.uploadNewPaper(b2.getTitle(), b2.getFile());
+            plagiatorService.uploadNewPaper(b3.getTitle(), b3.getFile());
+            plagiatorService.uploadNewPaper(book.getTitle(), book.getFile());
+            plagiatorService.uploadNewPaper(book2.getTitle(), book2.getFile());
 
             InvoiceItem item = InvoiceItem.builder().name(b3.getTitle())
                     .price(b3.getPrice()).quantity(1).build();
@@ -388,12 +415,15 @@ public class DummyDataService {
             baseUserRepository.save(reader1);
             baseUserRepository.save(reader2);
             baseUserRepository.save(reader3);
+            baseUserRepository.save(reader4);
             camundaUserService.createCamundaUser(reader1);
             camundaUserService.createCamundaUser(reader2);
             camundaUserService.createCamundaUser(reader3);
+            camundaUserService.createCamundaUser(reader4);
             indexingUnitService.createBetaReaderIndexingUnit(reader1);
             indexingUnitService.createBetaReaderIndexingUnit(reader2);
             indexingUnitService.createBetaReaderIndexingUnit(reader3);
+            indexingUnitService.createBetaReaderIndexingUnit(reader4);
         }
 
 
@@ -406,7 +436,7 @@ public class DummyDataService {
                     .name("Editor")
                     .surname("Editorovic")
                     .verified(true)
-                    .location(locationService.createLocation("Serbia", "Novi Sad"))
+                    .location(subotica.toBuilder().build())
                     .build();
 
             BaseUser editor2 = BaseUser.builder()
@@ -417,7 +447,7 @@ public class DummyDataService {
                     .name("Mujo")
                     .surname("Alen")
                     .verified(true)
-                    .location(locationService.createLocation("Serbia", "Novi Sad"))
+                    .location(subotica.toBuilder().build())
                     .build();
 
             BaseUser editor3 = BaseUser.builder()
@@ -428,7 +458,7 @@ public class DummyDataService {
                     .name("Jurica")
                     .surname("Juric")
                     .verified(true)
-                    .location(locationService.createLocation("Serbia", "Novi Sad"))
+                    .location(subotica.toBuilder().build())
                     .build();
 
             BaseUser editor4 = BaseUser.builder()
@@ -439,7 +469,7 @@ public class DummyDataService {
                     .name("Pero")
                     .surname("Nikic")
                     .verified(true)
-                    .location(locationService.createLocation("Serbia", "Novi Sad"))
+                    .location(subotica.toBuilder().build())
                     .build();
 
             baseUserRepository.save(editor);
@@ -461,7 +491,7 @@ public class DummyDataService {
                     .name("Lector")
                     .surname("Lectorovic")
                     .verified(true)
-                    .location(locationService.createLocation("Serbia", "Novi Sad"))
+                    .location(subotica.toBuilder().build())
                     .build();
 
             baseUserRepository.save(lector);
